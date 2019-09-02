@@ -20,6 +20,8 @@ find_package(Boost REQUIRED system)
 
 add_executable(${PROJECT_NAME}
   ${PROJECT_SOURCE_DIR}/src/main.cpp
+  ${PROJECT_SOURCE_DIR}/src/field.cpp
+  ${PROJECT_SOURCE_DIR}/src/agent.cpp
   )
 
 target_link_libraries(${PROJECT_NAME}
