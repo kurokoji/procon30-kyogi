@@ -48,6 +48,7 @@ constexpr next_actions<2>::next_actions() : _array() {
         }
 }
 
+// TODO: 3はstd::arrayのメモリが足りないのか動かないのでどうにかする
 template <>
 constexpr next_actions<3>::next_actions() : _array() {
   std::size_t idx = 0;
@@ -60,6 +61,7 @@ constexpr next_actions<3>::next_actions() : _array() {
               _array[idx++] = std::bitset<64>(i | (j << 4) | (k << 8) | (l << 12) | (m << 16) | (n << 20));
             }
 }
+// TODO: 4以上は候補数が多すぎるのでランダム生成するようにする
 
 }  // namespace util
 }  // namespace procon30
