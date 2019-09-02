@@ -9,7 +9,7 @@ project(${PROJECT_NAME} CXX)
 set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-std=c++17 -Wall -Wextra -Wno-unknown-pragmas")
-set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -pg -DDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-g3 -O0 -DDEBUG -march=x86-64")
 set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -DNDEBUG -march=x86-64")
 
 set(Boost_USE_STATIC_LIBS        ON)
