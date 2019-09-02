@@ -22,5 +22,11 @@ or
 mkdir build
 cd build
 cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
-make
+ninja
+```
+
+## 実行
+
+```
+./Solver
 ```
