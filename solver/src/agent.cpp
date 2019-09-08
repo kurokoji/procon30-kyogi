@@ -1,4 +1,5 @@
 #include <agent.hpp>
+#include <stdexcept>
 
 namespace procon30 {
 agent::agent() {}
