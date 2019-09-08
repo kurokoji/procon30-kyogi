@@ -62,7 +62,6 @@ constexpr next_actions<3>::next_actions() : _array() {
             }
 }
 // TODO: 4以上は候補数が多すぎるのでランダム生成するようにする
-
 }  // namespace util
 }  // namespace procon30
 

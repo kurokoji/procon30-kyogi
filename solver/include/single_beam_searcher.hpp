@@ -1,5 +1,5 @@
-#ifndef INCLUDE_BEAM_SEARCHER_HPP
-#define INCLUDE_BEAM_SEARCHER_HPP
+#ifndef INCLUDE_SINGLE_BEAM_SEARCHER_HPP
+#define INCLUDE_SINGLE_BEAM_SEARCHER_HPP
 
 #include <algorithm>
 #include <iostream>
@@ -12,7 +12,7 @@
 
 namespace procon30 {
 template <typename state_type, size_t beam_width>
-class beam_searcher {
+class single_beam_searcher {
 private:
   struct node;
   using node_ptr = std::shared_ptr<node>;
@@ -31,9 +31,9 @@ private:
   };
 
 public:
-  beam_searcher() {}
+  single_beam_searcher() {}
 
-  state_type solve(const state_type& init_state) const {
+  state_type solve(const state_type& init_state, color c) const {
     std::vector<node_ptr> bucket, next;
     bucket.reserve(beam_width * 1000);
     next.reserve(beam_width * 1000);
@@ -51,7 +51,7 @@ public:
       best = bucket.front();
 
       for (auto&& e : bucket) {
-        auto&& next_states = e->state().next_states();
+        auto&& next_states = e->state().next_states(c);
 
         for (auto&& st : next_states) {
           next.emplace_back(std::make_shared<node>(st, e));
@@ -62,12 +62,14 @@ public:
 
       // タイルポイントでソート
       std::partial_sort(next.begin(), next.begin() + width, next.end(), [](const node_ptr& lhs, const node_ptr& rhs) {
-        const score_type lhs_score = lhs->state().tile_point(color::ally) - lhs->state().tile_point(color::enemy),
-                         rhs_score = rhs->state().tile_point(color::ally) - rhs->state().tile_point(color::enemy);
+        const score_type lhs_score = lhs->state().all_point(color::ally) - lhs->state().all_point(color::enemy),
+                         rhs_score = rhs->state().all_point(color::ally) - rhs->state().all_point(color::enemy);
         return lhs_score > rhs_score;
       });
       next.erase(next.begin() + width, next.end());
       bucket.swap(next);
+
+      c = c == color::ally ? color::enemy : color::ally;
     }
     std::cerr << std::endl;
 
@@ -91,7 +93,8 @@ public:
       util::state_visualize(res.at(i));
     }
 
-    return best->state();
+    // return best->state();
+    return res.at(1);
   }
 };
 }  // namespace procon30

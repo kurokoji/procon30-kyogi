@@ -1,5 +1,5 @@
-#ifndef INCLUDE_STATE_HPP
-#define INCLUDE_STATE_HPP
+#ifndef INCLUDE_SINGLE_STATE_HPP
+#define INCLUDE_SINGLE_STATE_HPP
 
 #include <array>
 #include <iostream>
@@ -9,8 +9,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 
-#include <util/action_unpack.hpp>
-#include <util/next_actions.hpp>
+#include <util/single_action_unpack.hpp>
 #include <util/single_next_actions.hpp>
 #include <util/union_find.hpp>
 
@@ -21,7 +20,7 @@
 
 namespace procon30 {
 template <size_t _agent_count, size_t _height, size_t _width>
-class normal_state {
+class single_normal_state {
 private:
   static constexpr size_t _hash_length = _height * _width;
   size_t _turn, _max_turn;
@@ -30,7 +29,7 @@ private:
 
   field_state_hash<_hash_length> _ally_hash, _enemy_hash;
 
-  bool can_use_state(const normal_state& state) const {
+  bool can_use_state(const single_normal_state& state) const {
     boost::unordered_set<std::tuple<size_t, size_t>> check_hash;
     const auto& ally_hash = state.ally_hash();
     const auto& enemy_hash = state.enemy_hash();
@@ -63,7 +62,7 @@ private:
   }
 
 public:
-  normal_state(size_t turn, size_t max_turn, const field& field, const std::vector<agent>& allies,
+  single_normal_state(size_t turn, size_t max_turn, const field& field, const std::vector<agent>& allies,
                const std::vector<agent>& enemies)
       : _turn(turn),
         _max_turn(max_turn),
@@ -73,7 +72,7 @@ public:
         _ally_hash(),
         _enemy_hash() {}
 
-  normal_state(size_t turn, size_t max_turn, const procon30::field& field, const std::vector<agent>& allies,
+  single_normal_state(size_t turn, size_t max_turn, const procon30::field& field, const std::vector<agent>& allies,
                const std::vector<agent>& enemies, const field_state_hash<_hash_length>& ally_hash,
                const field_state_hash<_hash_length>& enemy_hash)
       : _turn(turn),
@@ -94,26 +93,27 @@ public:
 
   const std::vector<agent>& enemies() const { return _enemies; }
 
-  auto next_states() const {
+  auto next_states(color c) const {
     static constexpr std::array<int32, 9> dy = {0, 0, 1, 1, 1, 0, -1, -1, -1}, dx = {0, 1, 1, 0, -1, -1, -1, 0, 1};
-    std::vector<normal_state> ret;
+    std::vector<single_normal_state> ret;
 
     if (this->turn() >= this->max_turn()) return ret;
 
     // パターンの列挙
-    constexpr auto pattern = util::next_actions<_agent_count>();
+    constexpr auto pattern = util::single_next_actions<_agent_count>();
     for (size_t j = 0; j < pattern.size(); ++j) {
       auto&& action = pattern.at(j);
-      auto&& unpack = util::action_unpack<_agent_count>(action);
+      auto&& unpack = util::single_action_unpack<_agent_count>(action);
       std::vector<agent> next_allies = this->allies();
       std::vector<agent> next_enemies = this->enemies();
       field_state_hash<_hash_length> next_ally_hash = this->ally_hash();
       field_state_hash<_hash_length> next_enemy_hash = this->enemy_hash();
       const auto& field = this->field();
 
-      for (size_t i = 0; i < _agent_count * 2; ++i) {
+      for (size_t i = 0; i < _agent_count; ++i) {
+        //std::cerr << unpack.at(i) << std::endl;
         size_t ny = dy.at(unpack.at(i)), nx = dx.at(unpack.at(i));
-        if (i < _agent_count) {  // 自チームの列挙
+        if (c == color::ally) {  // 自チームの列挙
           agent& next_agent = next_allies.at(i);
 
           // 移動
@@ -131,7 +131,7 @@ public:
             next_ally_hash.set(_width * next_agent.y() + next_agent.x());
           }
         } else {  // 相手チームの列挙
-          agent& next_agent = next_enemies.at(i - _agent_count);
+          agent& next_agent = next_enemies.at(i);
 
           // 移動
           next_agent.move(ny, nx);
@@ -150,7 +150,7 @@ public:
         }
       }
 
-      auto&& next_state = normal_state(this->turn() + 1, this->max_turn(), field, next_allies, next_enemies,
+      auto&& next_state = single_normal_state(this->turn() + (c == color::enemy ? 1 : 0), this->max_turn(), field, next_allies, next_enemies,
                                        next_ally_hash, next_enemy_hash);
 
       if (can_use_state(next_state)) {
@@ -272,6 +272,5 @@ public:
   field_state_hash<_hash_length>& enemy_hash() { return _enemy_hash; }
 };
 
-}  // namespace procon30
-
+}
 #endif

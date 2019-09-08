@@ -1,9 +1,11 @@
 #include <agent.hpp>
 #include <beam_searcher.hpp>
+#include <single_beam_searcher.hpp>
 #include <color.hpp>
 #include <field.hpp>
 #include <state.hpp>
 #include <types.hpp>
+#include <single_state.hpp>
 
 #include <util/state_visualize.hpp>
 
@@ -13,7 +15,8 @@ int main(const int argc, const char* const* const argv) {
   using namespace procon30;
   using namespace boost::program_options;
 
-  constexpr size_t hash_length = 10 * 10, agent_count_c = 3;
+  constexpr size_t h_c = 10, w_c = 10;
+  constexpr size_t hash_length = h_c * w_c, agent_count_c = 3;
 
   if (true) {
     size_t now_turn, max_turn;
@@ -49,11 +52,13 @@ int main(const int argc, const char* const* const argv) {
       enemies.emplace_back(y, x, agent_id, color::enemy);
     }
 
-    using state = normal_state<agent_count_c, hash_length>;
+    // using state = normal_state<agent_count_c, hash_length>;
+    using state = single_normal_state<agent_count_c, h_c, w_c>;
     state init(now_turn, max_turn, field(h, w, f), allies, enemies, ally_hash, enemy_hash);
-    beam_searcher<state, agent_count_c> solver;
+    single_beam_searcher<state, 3> solver;
 
-    auto&& res = solver.solve(init);
+    util::state_visualize(init);
+    auto&& res = solver.solve(init, color::ally);
 
     std::cerr << "End" << std::endl;
 

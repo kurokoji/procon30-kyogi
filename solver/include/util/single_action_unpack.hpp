@@ -1,5 +1,5 @@
-#ifndef INCLUDE_ACTION_UNPACK
-#define INCLUDE_ACTION_UNPACK
+#ifndef INCLUDE_SINGLE_ACTION_UNPACK
+#define INCLUDE_SINGLE_ACTION_UNPACK
 
 #include <array>
 
@@ -7,13 +7,12 @@
 
 namespace procon30 {
 namespace util {
-
 template <std::size_t N>
-auto action_unpack(const action_pattern_type& action) {
-  std::array<std::size_t, N * 2> ret;
+auto single_action_unpack(const action_pattern_type& action) {
+  std::array<std::size_t, N> ret;
   action_pattern_type mask("1111");
 
-  for (std::size_t i = 0; i < N * 2; ++i) {
+  for (std::size_t i = 0; i < N; ++i) {
     ret.at(i) = ((action >> (i * 4)) & mask).to_ulong();
   }
 
