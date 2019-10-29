@@ -75,6 +75,19 @@ constexpr single_next_actions<5>::single_next_actions() : _array() {
           }
 }
 
+template <>
+constexpr single_next_actions<6>::single_next_actions() : _array() {
+  std::size_t idx = 0;
+  for (std::size_t i = 0; i < 9; ++i)
+    for (std::size_t j = 0; j < 9; ++j)
+      for (std::size_t k = 0; k < 9; ++k)
+        for (std::size_t l = 0; l < 9; ++l)
+          for (std::size_t m = 0; m < 9; ++m)
+            for (std::size_t n = 0; n < 9; ++n) {
+            _array[idx++] = std::bitset<64>(i | (j << 4) | (k << 8) | (l << 12) | (m << 16) | (n << 20));
+          }
+}
+
 }  // namespace util
 }  // namespace procon30
 

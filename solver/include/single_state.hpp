@@ -100,7 +100,7 @@ public:
     if (this->turn() >= this->max_turn()) return ret;
 
     // パターンの列挙
-    constexpr auto pattern = util::single_next_actions<_agent_count>();
+    static constexpr auto pattern = util::single_next_actions<_agent_count>();
     for (size_t j = 0; j < pattern.size(); ++j) {
       auto&& action = pattern.at(j);
       auto&& unpack = util::single_action_unpack<_agent_count>(action);
@@ -193,7 +193,7 @@ public:
       ret = false;
 
       // 下方向に自マスがあるか
-      for (int32 i = y + 1; i < _height; ++i) {
+      for (int32 i = y + 1; i < static_cast<int32>(_height); ++i) {
         if (board.test(i * _width + x)) {
           ret = true;
           break;
@@ -215,7 +215,7 @@ public:
       ret = false;
 
       // 右方向に自マスがあるか
-      for (int32 i = x + 1; i < _width; ++i) {
+      for (int32 i = x + 1; i < static_cast<int32>(_width); ++i) {
         if (board.test(y * _width + i)) {
           ret = true;
           break;
@@ -231,7 +231,7 @@ public:
         if (board.test(i * _width + j)) continue;
         for (size_t k = 0; k < 4; ++k) {
           int32 ny = dy[k] + i, nx = dx[k] + j;
-          if (!(0 <= ny && ny < _height && 0 <= nx && nx < _width)) continue;
+          if (!(0 <= ny && ny < static_cast<int32>(_height) && 0 <= nx && nx < static_cast<int32>(_width))) continue;
           if (board.test(ny * _width + nx)) continue;
           uf.unite(i * _width + j, ny * _width + nx);
         }

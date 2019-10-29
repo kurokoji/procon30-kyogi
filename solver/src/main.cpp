@@ -18,7 +18,24 @@ int main(const int argc, const char* const* const argv) {
   constexpr size_t h_c = 10, w_c = 10;
   constexpr size_t hash_length = h_c * w_c, agent_count_c = 3;
 
-  if (true) {
+  // オプション設定
+  options_description description("Usage");
+  description.add_options()
+    ("std,s", "use standard-io")
+    ("help,h", "help");
+
+  variables_map vm;
+  store(parse_command_line(argc, argv, description), vm);
+  notify(vm);
+
+  if (vm.count("help") || vm.empty()) {
+    std::cout << description << std::endl;
+    return 0;
+  }
+
+
+
+  if (vm.count("std")) {
     size_t now_turn, max_turn;
     size_t h, w;
     std::cin >> now_turn >> max_turn >> h >> w;
